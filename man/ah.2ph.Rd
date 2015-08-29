@@ -35,6 +35,7 @@ and analyze the combined dataset of  phase I and phase II samples.
 }
 \examples{
 library(survival)
+library(rootSolve)
 ### load data
 nwts <- nwtsco[1:100,]
 

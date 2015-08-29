@@ -30,6 +30,7 @@
 # 
 #' @examples
 #' library(survival)
+#' library(rootSolve)
 #' ### load data 
 #' nwts <- nwtsco[1:100,]
 #'
