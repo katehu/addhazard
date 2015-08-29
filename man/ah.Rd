@@ -19,7 +19,7 @@ The outcome is a survival object created by \code{\link[survival]{Surv}}.}
 \item{...}{additional arguments to be passed to the low level regression fitting functions (see below).}
 }
 \value{
-An object of class "ah" representing the fit.
+An object of class 'ah' representing the fit.
 }
 \description{
 Fit a semiparametric additive hazard model \deqn{ \lambda(t|Z=z) = \lambda_0(t) + \beta'z.} The

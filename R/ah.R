@@ -10,7 +10,7 @@
 #' @param weights  a numeric vector. The weight of each observation.
 #' @param ... additional arguments to be passed to the low level regression fitting functions (see below).
 #'
-#' @return An object of class "ah" representing the fit.
+#' @return An object of class 'ah' representing the fit.
 #'
 #' @note
 #'  The response variable is a survival object. If there are ties in the
@@ -51,156 +51,133 @@
 #' nwts_all$trel <- nwtsco$trel + runif(dim(nwts_all)[1],0,1)*1e-8
 #' fit3 <- ah(Surv(trel,relaps) ~ age + instit, data = nwts_all, robust = TRUE)
 
-ah <- function(formula,data,robust,weights,...){
-  
-  Call <- match.call()
-  indx <- match(c("formula", "data" ), 
-              names(Call), nomatch = 0)
-  
-
-  if (indx[1] == 0) 
-     stop("A formula argument is required")
-  temp <- Call[c(1, indx)]
-  temp[[1]] <- as.name("model.frame")
-  temp$formula <- if (missing(data)) 
-  terms(formula)
-  else terms(formula, data = data)
- 
-  mf <- eval(temp, parent.frame())
-  if (nrow(mf) == 0) 
-  stop("No (non-missing) observations")
-  Terms <- terms(mf)
-
-     # weights <- model.weights(mf)
-      #print(weights[1:5])
-#print(length(weights))
-#print(extraArgs)
-
-
-#if (length(extraArgs)) {
- # controlargs <- names(formals(coxph.control))
-  #indx <- pmatch(names(extraArgs), controlargs, nomatch = 0L)
- # if (any(indx == 0L)) 
-  #  stop(gettextf("Argument %s not matched", names(extraArgs)[indx == 
-                                                              #  0L]), domain = NA)
-#}
-
-
-  Y <- model.extract(mf, "response")
-  if (!inherits(Y, "Surv")) 
-     stop("Response must be a survival object")
-  type <- attr(Y, "type")
-  if (type != "right" ) 
-    stop(paste("additive hazard model doesn't support \"", type, "\" survival data", 
-             sep = ""))
-  nobs <- nrow(Y)
-  X <- model.matrix(Terms, mf)[,-1]
-  
-   
-
-    # if (storage.mode(Y) != "double") 
-     #   storage.mode(Y) <- "double"
-    # attr(X, "assign") <- Xatt$assign
-       # xlevels <- .getXlevels(Terms, mf)
-      
-    if (missing(robust)||is.null(robust)) 
-      robust <- FALSE
+ah <- function(formula, data, robust, weights, ...) {
+    
+    Call <- match.call()
+    indx <- match(c("formula", "data"), names(Call), nomatch = 0)
+    
+    
+    if (indx[1] == 0) 
+        stop("A formula argument is required")
+    temp <- Call[c(1, indx)]
+    temp[[1]] <- as.name("model.frame")
+    temp$formula <- if (missing(data)) 
+        terms(formula) else terms(formula, data = data)
+    
+    mf <- eval(temp, parent.frame())
+    if (nrow(mf) == 0) 
+        stop("No (non-missing) observations")
+    Terms <- terms(mf)
+    
+    # weights <- model.weights(mf) print(weights[1:5])
+    # print(length(weights)) print(extraArgs)
+    
+    
+    # if (length(extraArgs)) { controlargs <-
+    # names(formals(coxph.control)) indx <-
+    # pmatch(names(extraArgs), controlargs, nomatch = 0L) if
+    # (any(indx == 0L)) stop(gettextf('Argument %s not matched',
+    # names(extraArgs)[indx == 0L]), domain = NA) }
+    
+    
+    Y <- model.extract(mf, "response")
+    if (!inherits(Y, "Surv")) 
+        stop("Response must be a survival object")
+    type <- attr(Y, "type")
+    if (type != "right") 
+        stop(paste("additive hazard model doesn't support \"", 
+            type, "\" survival data", sep = ""))
+    nobs <- nrow(Y)
+    X <- model.matrix(Terms, mf)[, -1]
+    
+    
+    
+    # if (storage.mode(Y) != 'double') storage.mode(Y) <-
+    # 'double' attr(X, 'assign') <- Xatt$assign xlevels <-
+    # .getXlevels(Terms, mf)
+    
+    if (missing(robust) || is.null(robust)) 
+        robust <- FALSE
     if (missing(weights) || is.null(weights)) 
         weights <- rep(1, nobs)
-    #if(missing(ties)||is.null(ties))
-   #stop(paste("declare whether there are ties in survival times"))
-   
+    # if(missing(ties)||is.null(ties)) stop(paste('declare
+    # whether there are ties in survival times'))
     
- 
-    #if (!ties){
-      fit <- ahaz::ahaz(Y,X, weights= weights,robust=robust)
-      fit$coef<-summary(fit)$coef[,1]
-      fit$se<-summary(fit)$coef[,2]
-      
-      #fit$var<-fit$se^2
-      fit$iA<-solve(fit$D)
-      fit$var<-fit$iA%*%fit$B%*%fit$iA
-      fit$resid<-residuals(fit)
-      fit$npar<-fit$nvar
-
-    #}
-      #else{
-       # fit<-ah.fit(X, Y, wts= weights,robust=robust)
-        #fit$resid<-residuals(fit,type="pseudoscore")*weights
-      #}
-
-       
-    #if (!is.null(fit$coef) && any(is.na(fit$coef))) {
-     # vars <- (1:length(fit$coef))[is.na(fit$coefs)]
-     # msg <- paste("X matrix deemed to be singular; variable", 
-      #             paste(vars, collapse = " "))
-      #if (singular.ok) 
-       # warning(msg)
-      #else stop(msg)
-    #}
     
-  
+    
+    # if (!ties){
+    fit <- ahaz::ahaz(Y, X, weights = weights, robust = robust)
+    fit$coef <- summary(fit)$coef[, 1]
+    fit$se <- summary(fit)$coef[, 2]
+    
+    # fit$var<-fit$se^2
+    fit$iA <- solve(fit$D)
+    fit$var <- fit$iA %*% fit$B %*% fit$iA
+    fit$resid <- residuals(fit)
+    fit$npar <- fit$nvar
+    
+    # } else{ fit<-ah.fit(X, Y, wts= weights,robust=robust)
+    # fit$resid<-residuals(fit,type='pseudoscore')*weights }
+    
+    
+    # if (!is.null(fit$coef) && any(is.na(fit$coef))) { vars <-
+    # (1:length(fit$coef))[is.na(fit$coefs)] msg <- paste('X
+    # matrix deemed to be singular; variable', paste(vars,
+    # collapse = ' ')) if (singular.ok) warning(msg) else
+    # stop(msg) }
+    
+    
     fit$weights <- weights
-    #fit$ties=ties
-    fit$robust=robust
-
+    # fit$ties=ties
+    fit$robust = robust
+    
     fit$terms <- Terms
-    fit$formula <- formula(Terms) 
+    fit$formula <- formula(Terms)
     fit$model <- mf
     fit$call <- Call
-
+    
     fit$nevent <- sum(Y[, ncol(Y)])
-    fit$nobs<-nobs
+    fit$nobs <- nobs
     fit$data <- data
     
-  
+    
     fit$x <- X
     fit$y <- Y
     
     
     
-    # fit$xlevels <- xlevels
-    #fit$assign <- assign
-
-    #if (robust) {
-      
-      
-      
-      
-     # fit$naive.var <- fit$var
-      
-      
-    #temp<-residuals.ah(fit,type="pseudoscore")
-     #   B.rob <- t(temp*weights) %*% (temp*weights)
-      #  fit$var<-fit$iA%*%B.rob %*%fit$iA
-       # fit$B.rob<-B.rob
-        
-      #}
-    #  fit2 <- c(fit, list(x = X, y = Y, weights = weights))
-  
-     
-     #   temp <- residuals.coxph(fit2, type = "dfbeta", 
-                                #weighted = TRUE)
-      #  fit2$linear.predictors <- 0 * fit$linear.predictors
-      #  temp0 <- residuals.coxph(fit2, type = "score", 
-                                 #weighted = TRUE)
-      #}
-      #fit$var <- t(temp) %*% temp
-      #u <- apply(as.matrix(temp0), 2, sum)
-      #fit$rscore <- coxph.wtest(t(temp0) %*% temp0, u, 
-      #                          control$toler.chol)$test
-    #}
-   # if (length(fit$coefficients) && is.null(fit$wald.test)) {
-   #   nabeta <- !is.na(fit$coefficients)
-    #  if (is.null(init)) 
-     #   temp <- fit$coefficients[nabeta]
-      #else temp <- (fit$coefficients - init[1:length(fit$coefficients)])[nabeta]
-      #fit$wald.test <- coxph.wtest(fit$var[nabeta, nabeta], 
-       #                            temp, control$toler.chol)$test
-    #}
-  # na.action <- attr(mf, "na.action")
-   # if (length(na.action)) 
-    #  fit$na.action <- na.action
-  class(fit) <- "ah"
-  fit
-}
+    # fit$xlevels <- xlevels fit$assign <- assign
+    
+    # if (robust) {
+    
+    
+    
+    
+    # fit$naive.var <- fit$var
+    
+    
+    # temp<-residuals.ah(fit,type='pseudoscore') B.rob <-
+    # t(temp*weights) %*% (temp*weights) fit$var<-fit$iA%*%B.rob
+    # %*%fit$iA fit$B.rob<-B.rob
+    
+    # } fit2 <- c(fit, list(x = X, y = Y, weights = weights))
+    
+    
+    # temp <- residuals.coxph(fit2, type = 'dfbeta', weighted =
+    # TRUE) fit2$linear.predictors <- 0 * fit$linear.predictors
+    # temp0 <- residuals.coxph(fit2, type = 'score', weighted =
+    # TRUE) } fit$var <- t(temp) %*% temp u <-
+    # apply(as.matrix(temp0), 2, sum) fit$rscore <-
+    # coxph.wtest(t(temp0) %*% temp0, u,
+    # control$toler.chol)$test } if (length(fit$coefficients) &&
+    # is.null(fit$wald.test)) { nabeta <-
+    # !is.na(fit$coefficients) if (is.null(init)) temp <-
+    # fit$coefficients[nabeta] else temp <- (fit$coefficients -
+    # init[1:length(fit$coefficients)])[nabeta] fit$wald.test <-
+    # coxph.wtest(fit$var[nabeta, nabeta], temp,
+    # control$toler.chol)$test } na.action <- attr(mf,
+    # 'na.action') if (length(na.action)) fit$na.action <-
+    # na.action
+    class(fit) <- "ah"
+    fit
+} 

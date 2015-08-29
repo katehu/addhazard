@@ -22,7 +22,7 @@ The outcome is a survival object created by \code{\link[survival]{Surv}}.}
 They are used to calibrate the weight assigned to each subject in order to improve estimation efficiency.}
 }
 \value{
-An object of class "ah.2h" representing the fit.
+An object of class 'ah.2h' representing the fit.
 }
 \description{
 The function fits a semiparametric additive hazards model \deqn{ \lambda(t|Z=z) = \lambda_0(t) + \beta'z.} to
@@ -43,10 +43,15 @@ nwts$strt <- 1+nwts$instit
 ### add a stratum containing all (relapsed) cases
 nwts$strt[nwts$relaps==1] <- 3
 
-### assign phase II subsampling probabilities
+######################################################################
+### When phase II samples are obtained by Bernoulli Sampling #########
+######################################################################
+
+### assign phase II subsampling (Bernoulli) probabilities
 ### oversample unfavorable histology (instit =1) and cases
-### Pi = 0.5 for instit =0, Pi =1 for instit =1 and relaps =1
-nwts$Pi<-  0.5 * (nwts$strt == 1) + 1 * (nwts$strt == 2) + 1 * (nwts$strt == 3)
+### Pi = 0.5 for instit =0, Pi = 0.9 for instit =1 and relaps =1
+nwts$Pi <- 0.5 * (nwts$strt == 1) + 0.9 * (nwts$strt == 2) +
+           0.9 * (nwts$strt == 3)
 
 ### generate phase II sampling indicators
 N <- dim(nwts)[1]
@@ -60,7 +65,7 @@ summary(fit1)
 
 ### fit an additve hazards model with calibration on age
 fit2 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts, R = in.ph2, Pi = Pi,
-                                   robust = FALSE, calibration.variables = age)
+                                   robust = FALSE, calibration.variables = "age")
 summary(fit2)
 
 ### calibrate on age square
@@ -68,8 +73,46 @@ summary(fit2)
 ### the new variable should be added to the original data frame
 nwts$age2 <- nwts$age^2
 fit3 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts, R = in.ph2, Pi = Pi,
-                                   robust = FALSE, calibration.variables = age2)
+                                   robust = FALSE, calibration.variables = "age2")
 summary(fit3)
+
+#############################################################################
+### When phase II samples are obtained by finite Sampling       #############
+#############################################################################
+
+### calculating the sample size for each straum
+### calculate the strata size
+strt.size <- table(nwts$strt)
+### the subsample sizes are determined by the following probabilities
+### 0.5 for nwts$strt == 1 , 0.9 for nwts$strt == 2 and nwts$strt == 3
+strt.prob <- c(0.5, 0.9, 0.9)
+### determine the subsample size for each stratum
+size.ph2 <- round(strt.size * strt.prob)
+### Generate phase II selection indicators
+nwts$in.ph2 <- rep(1, nrow(nwts))
+for (i in 1:length(strt.size)){
+   idx.selected <- sample(1:strt.size[i], size.ph2[i], replace = F)
+   nwts$in.ph2[nwts$strt ==i][-idx.selected] <- 0
+}
+### fit an additve hazards model with finite stratified sampling
+### calculate the sampling fractions
+frac <- size.ph2/strt.size
+### treating the problem as bernoulli sampling coupled with calibration on strata sizes
+### using frac as the sampling probilities
+nwts$Pi <- NULL
+for (i in 1:length(strt.size)){
+  nwts$Pi[nwts$strt ==i] <- frac[i]
+}
+
+### create strt indicators, which become our calibration variables
+for (i in 1:length(strt.size)){
+   nwts$strt_ind <- as.numeric(nwts$strt ==i)
+   names(nwts)[ncol(nwts)]= paste0("strt", i)
+}
+### fit an additve hazards model with finate sampling
+fit4 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts, R = in.ph2, Pi = Pi,
+                                 robust = FALSE,  calibration.variables = c("strt1","strt2","strt3"))
+summary(fit4)
 }
 \references{
 Jie Hu (2014) A Z-estimation System for Two-phase Sampling with Applications to Additive Hazards Models and

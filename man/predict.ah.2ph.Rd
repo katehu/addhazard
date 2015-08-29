@@ -7,7 +7,7 @@
 \method{predict}{ah.2ph}(object, newdata, newtime, ...)
 }
 \arguments{
-\item{object}{an object of class inhering from "ah.2ph".}
+\item{object}{an object of class inhering from 'ah.2ph'.}
 
 \item{newdata}{a dataframe of an individual's predictors.}
 
@@ -56,7 +56,7 @@ predict(fit1, newdata, newtime = c(3,5))
 ### fit an additve hazards model to  two-phase sampling data with calibration
 ### The calibration variable is stage
 fit2 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts, R = in.ph2, Pi = Pi,
-                                   robust = FALSE, calibration.variables = stage)
+                                   robust = FALSE, calibration.variables = "stage")
 
 ### based on the fitted model fit2, perform prediction at time points t =3 and t= 5
 predict(fit2, newdata, newtime = c(3,5))
