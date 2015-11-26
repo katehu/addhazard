@@ -54,9 +54,7 @@
 ah <- function(formula, data, robust, weights, ...) {
     
     Call <- match.call()
-    indx <- match(c("formula", "data"), names(Call), nomatch = 0)
-    
-    
+    indx <- match(c("formula", "data", "weights"), names(Call), nomatch = 0)  
     if (indx[1] == 0) 
         stop("A formula argument is required")
     temp <- Call[c(1, indx)]
@@ -67,49 +65,33 @@ ah <- function(formula, data, robust, weights, ...) {
     mf <- eval(temp, parent.frame())
     if (nrow(mf) == 0) 
         stop("No (non-missing) observations")
-    Terms <- terms(mf)
-    
-    # weights <- model.weights(mf) print(weights[1:5])
-    # print(length(weights)) print(extraArgs)
-    
-    
-    # if (length(extraArgs)) { controlargs <-
-    # names(formals(coxph.control)) indx <-
-    # pmatch(names(extraArgs), controlargs, nomatch = 0L) if
-    # (any(indx == 0L)) stop(gettextf('Argument %s not matched',
-    # names(extraArgs)[indx == 0L]), domain = NA) }
-    
-    
+    Terms <- terms(mf)  
     Y <- model.extract(mf, "response")
     if (!inherits(Y, "Surv")) 
         stop("Response must be a survival object")
     type <- attr(Y, "type")
-    if (type != "right") 
+    if (type != "right" && type != "counting") 
         stop(paste("additive hazard model doesn't support \"", 
             type, "\" survival data", sep = ""))
+    weights <- model.weights(mf)
     nobs <- nrow(Y)
     X <- model.matrix(Terms, mf)[, -1]
     
-    
-    
-    # if (storage.mode(Y) != 'double') storage.mode(Y) <-
-    # 'double' attr(X, 'assign') <- Xatt$assign xlevels <-
-    # .getXlevels(Terms, mf)
-    
+  
     if (missing(robust) || is.null(robust)) 
         robust <- FALSE
     if (missing(weights) || is.null(weights)) 
         weights <- rep(1, nobs)
+    
+    ### need to develop 
     # if(missing(ties)||is.null(ties)) stop(paste('declare
     # whether there are ties in survival times'))
-    
-    
-    
     # if (!ties){
     fit <- ahaz::ahaz(Y, X, weights = weights, robust = robust)
     fit$coef <- summary(fit)$coef[, 1]
     fit$se <- summary(fit)$coef[, 2]
     
+   
     # fit$var<-fit$se^2
     fit$iA <- solve(fit$D)
     fit$var <- fit$iA %*% fit$B %*% fit$iA

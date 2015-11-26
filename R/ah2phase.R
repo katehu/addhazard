@@ -1,3 +1,4 @@
+
 #' Fit Additive Hazards Regression Models to Two-phase Sampling
 #'
 #' The function fits a semiparametric additive hazards model \deqn{ \lambda(t|Z=z) = \lambda_0(t) + \beta'z.} to 
@@ -120,8 +121,9 @@ ah.2ph <- function(formula, data, R, Pi, robust = FALSE, calibration.variables =
     Pi = data[, as.character(Call[["Pi"]])]
     calibration.variables = data[, calibration.variables]
     Pi.pha2 <- Pi[R == 1]
-    wts.pha2 <- as.numeric(1/Pi.pha2)
     data.pha2 <- data[R == 1, ]
+ 
+    data.pha2$wts.pha2 <- as.numeric(1/Pi.pha2)
     
     
     
@@ -146,20 +148,20 @@ ah.2ph <- function(formula, data, R, Pi, robust = FALSE, calibration.variables =
         aux.pha2 <- aux[R == 1, ]
         
         wts.cal <- cook.wts.cal(aux = aux, aux.pha2 = aux.pha2, 
-            P = P, wts.pha2 = wts.pha2)
-        wts.pha2 <- wts.cal
+            P = P, wts.pha2 = data.pha2$wts.pha2)
+        data.pha2$wts.pha2 <- wts.cal
         
         fit.A <- ah(formula, data = data.pha2, robust = robust, 
             weights = wts.pha2)
         resid <- fit.A$resid
-        temp1 <- resid * sqrt(1/wts.pha2)
+        temp1 <- resid * sqrt(1/wts.cal)
         
         
         Q <- t(aux.pha2 * sqrt(wts.cal)) %*% (resid/sqrt(wts.cal))  # multiplied by sqrt(wts.cal) because Qf= sum wts.cal*f
         # and resid already weighted by wts.cal
         resid.adj <- resid - (aux.pha2 %*% solve(P) %*% Q) * 
             wts.cal
-        temp <- resid.adj * sqrt((1 - Pi.pha2)/(Pi.pha2 * wts.pha2))
+        temp <- resid.adj * sqrt((1 - Pi.pha2)/(Pi.pha2 * wts.cal))
         
     }
     
@@ -181,7 +183,7 @@ ah.2ph <- function(formula, data, R, Pi, robust = FALSE, calibration.variables =
     fit$var.tot <- var.pha1 + var.pha2
     fit$se <- sqrt(diag(var.tot))
     fit$Pi.pha2 <- Pi.pha2
-    fit$wts.pha2 <- wts.pha2
+    fit$wts.pha2 <- data.pha2$wts.pha2
     fit$calibration.variables <- calibration.variables
     fit$R <- R
     fit$call <- Call

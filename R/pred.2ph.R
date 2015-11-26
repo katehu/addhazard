@@ -169,7 +169,7 @@ predict.ah.2ph <- function(object, newdata, newtime, ...) {
             wts.cal <- cook.wts.cal(aux = aux, aux.pha2 = aux.pha2, 
                 P = P, wts.pha2 = wts.pha2)
             wts.pha2 <- wts.cal
-            
+            object1$data$wts.pha2 <- wts.pha2
             
             # using the calibrated refit the additive hazards model
             object1 <- ah(object1$formula, object1$data, weights = wts.pha2, 
