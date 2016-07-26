@@ -1,6 +1,6 @@
 #' @importFrom stats printCoefmat pnorm
 
-
+#' @export
 summary.ah <- function(object, ...) {
     options(digits = 5)
     ci.lower <- object$coef - 1.96 * object$se
