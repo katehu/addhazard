@@ -1,3 +1,10 @@
+#######################################################
+# Author: Kate HU
+# Date: July 27th, 2016
+# Task: update finite sampling 
+# To do: Interval censoring 
+#######################################################
+
 
 #' Fit Additive Hazards Regression Models to Two-phase Sampling
 #'
@@ -32,36 +39,15 @@
 #' @examples
 #' library(survival)
 #' library(rootSolve)
-#' ### load data 
-#' nwts <- nwtsco[1:100,]
-#'
-#' ### create strata based on institutional histology and disease status
-#' nwts$strt <- 1+nwts$instit
-#' ### add a stratum containing all (relapsed) cases
-#' nwts$strt[nwts$relaps==1] <- 3
-#'
-#' ######################################################################
-#' ### When phase II samples are obtained by Bernoulli Sampling #########
-#' ######################################################################
-#'
-#' ### assign phase II subsampling (Bernoulli) probabilities 
-#' ### oversample unfavorable histology (instit =1) and cases
-#' ### Pi = 0.5 for instit =0, Pi = 0.9 for instit =1 and relaps =1 
-#' nwts$Pi <- 0.5 * (nwts$strt == 1) + 0.9 * (nwts$strt == 2) +
-#'            0.9 * (nwts$strt == 3)
-#'
-#' ### generate phase II sampling indicators
-#' N <- dim(nwts)[1]
-#' nwts$in.ph2 <-  rbinom(N, 1, nwts$Pi)
-#'
+#' 
 #' ### fit an additive hazards model to two-phase sampling data without calibration
-#' fit1 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts, R = in.ph2, Pi = Pi,
+#' fit1 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts.2ph, R = in.ph2, Pi = Pi,
 #'                                  robust = FALSE,  calibration.variables = NULL)
 #' summary(fit1)
 #'
 #' 
 #' ### fit an additve hazards model with calibration on age 
-#' fit2 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts, R = in.ph2, Pi = Pi, 
+#' fit2 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts.2ph, R = in.ph2, Pi = Pi, 
 #'                                    robust = FALSE, calibration.variables = "age")
 #' summary(fit2)
 #'
@@ -69,7 +55,7 @@
 #' ### note if users create a  calibration variable, then 
 #' ### the new variable should be added to the original data frame
 #' nwts$age2 <- nwts$age^2 
-#' fit3 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts, R = in.ph2, Pi = Pi, 
+#' fit3 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts.2ph, R = in.ph2, Pi = Pi, 
 #'                                    robust = FALSE, calibration.variables = "age2")
 #' summary(fit3)
 #' 
