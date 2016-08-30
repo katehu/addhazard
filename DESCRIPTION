@@ -1,16 +1,16 @@
 Package: addhazard
 Title:  Fit Additive Hazards Models for Survival Analysis
-Version: 1.0.0
+Version: 1.0.1
 Authors@R:  c(person("Jie (Kate)","Hu", role = c("aut", "cre"),
                     email = "hujie0704@gmail.com"),
-                    person("Norman","Breslow", role = "aut"), 
+                    person("Norman","Breslow", role = "aut"),
                     person("Gary","Chan", role = "aut"))
 Date: 2015-08-08
-Description: Contains tools to fit additive hazards model to random sampling, two-phase sampling and two-phase sampling with auxiliary information. This package provides regression parameter estimates and their model-based and robust standard errors.  It also offers tools to make prediction of individual specific hazards.
-LazyData: true 
+Description: Contains tools to fit the additive hazards model to random sampling, two-phase sampling and two-phase sampling with auxiliary information. This package provides regression parameter estimates and their model-based and robust standard errors.  It also offers tools to make prediction of individual specific hazards.
+LazyData: true
 Depends: R (>= 3.1.2)
 Imports: ahaz,
         survival,
         rootSolve
 License:GPL-2
-        
+
