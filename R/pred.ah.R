@@ -1,7 +1,8 @@
 #' Prediction Based on the Fitted Additive Hazards Model
 #'
-#' This function predicts a subject's overall hazard rates at given time points based on this subject's covariate
-#' values.  The prediction function is an additive hazards model fitted using \code{\link{ah}}.
+#' This function predicts a subject's overall hazard rates at given time points
+#' based on this subject's covariate values.  The prediction function is an additive
+#' hazards model fitted using \code{\link{ah}}.
 #'
 #' @param object an object of class inhering from \code{\link{ah}}.
 #' @param newdata  a dataframe of an individual's predictors.
@@ -22,7 +23,7 @@
 #' library(survival)
 #' ###  fit the additive hazards model to the data
 #' nwts<- nwtsco[1:100,]
-#' fit <- ah(Surv(trel,relaps) ~ age + instit, data = nwts,  ties = F, robust = FALSE)
+#' fit <- ah(Surv(trel,relaps) ~ age + instit, data = nwts,  ties = FALSE, robust = FALSE)
 #'
 #' ###  see the covariate names in the prediction function
 #' fit$call
@@ -94,8 +95,9 @@ predict.ah <- function(object, newdata, newtime, ...) {
     for (i in 1:length(newtime)) {
         # newtime s is less than t_1, then we report
         if (newtime[i] < t.unique[1]) {
-            print(paste("The data used for building the ah model does not have enough information for predicting such a small t, t=",
-                newtime[i], "."))
+            print(paste("The data used for building the ah model does not have enough
+                          information for predicting such a small t, t=",
+                        newtime[i], "."))
             print(paste("remove, t=", newtime[i], " and run the prediction again"))
         } else {
 
@@ -130,10 +132,3 @@ predict.ah <- function(object, newdata, newtime, ...) {
     L.se <- sqrt(L.var)
     return(data.frame(time = newtime, L = L, L.se = L.se))
 }
-
-
-
-
-
-
-

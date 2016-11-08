@@ -8,30 +8,37 @@
 
 #' Fit Additive Hazards Regression Models
 #'
-#' Fit a semiparametric additive hazard model \deqn{ \lambda(t|Z=z) = \lambda_0(t) + \beta'z.} The
-#' estimating procedures follow Lin & Ying (1994).
+#' Fit a semiparametric additive hazard model
+#' '\deqn{ \lambda(t|Z=z) = \lambda_0(t) + \beta'z.}
+#' The estimating procedures follow Lin & Ying (1994).
 #'
-#' @param formula a formula object for the regression model of the form response ~ predictors.
-#'      The outcome is a survival object created by \code{\link[survival]{Surv}}.
+#' @param formula a formula object for the regression model of the form
+#'  response ~ predictors. The outcome is a survival object created by
+#'  \code{\link[survival]{Surv}}.
 #' @param data  a data frame. Input dataset.
-#' @param robust a logical variable.  Robust standard errors are provided if robust == TRUE.
+#' @param ties a logical variable. FALSE if there are no ties in the censored failure times.
+#' @param robust a logical variable.  Robust standard errors are provided if
+#'  robust == TRUE.
 #' @param weights  a numeric vector. The weight of each observation.
-#' @param ... additional arguments to be passed to the low level regression fitting functions (see below).
+#' @param ... additional arguments to be passed to the low level regression
+#'  fitting functions.
 #'
 #' @return An object of class 'ah' representing the fit.
 #'
 #' @note
 #'  The response variable is a survival object. If there are ties in the
 #'  survival time, in the current version we recommend users to break ties by adding
-#'  a small random number to the survival time. An example is provided.  The regression model can be univariate or multivariate. This
-#'  package is built upon the function \code{\link[ahaz]{ahaz}} by Anders Gorst-Rasmussen.
+#'  a small random number to the survival time. An example is provided.  The regression
+#'  model can be univariate or multivariate. This package is built upon the function
+#'  \code{\link[ahaz]{ahaz}} by Anders Gorst-Rasmussen.
 #'
 #'
-#' @seealso \code{\link{predict.ah}} for prediction based on fitted \code{\link{ah}} model, \code{\link{nwtsco}} for
-#' the description of nwtsco dataset
+#' @seealso \code{\link{predict.ah}} for prediction based on fitted
+#'  \code{\link{ah}} model, \code{\link{nwtsco}} for the description of nwtsco dataset
 #'
 #' @references
-#' Lin, D.Y. & Ying, Z. (1994). Semiparametric analysis of the additive risk model. Biometrika; 81:61-71.
+#' Lin, D.Y. & Ying, Z. (1994). Semiparametric analysis of the additive risk model.
+#'                              Biometrika; 81:61-71.
 #'
 #' @importFrom survival Surv
 #' @importFrom stats residuals model.matrix model.extract terms
@@ -44,17 +51,17 @@
 #'
 #' ### fit the additive hazards model to the data
 #' ### the model-based standard errors are reported when setting robust = FALSE
-#' fit1 <- ah(Surv(trel,relaps) ~ age + instit, ties = F, data = nwts, robust = FALSE)
+#' fit1 <- ah(Surv(trel,relaps) ~ age + instit, ties = FALSE, data = nwts, robust = FALSE)
 #' summary(fit1)
 #'
 #' ### fit the additive hazards model to the data with robust standard errors
-#' fit2 <- ah(Surv(trel,relaps) ~ age + instit, ties = F, data = nwts, robust = TRUE)
+#' fit2 <- ah(Surv(trel,relaps) ~ age + instit, ties = FALSE, data = nwts, robust = TRUE)
 #' summary(fit2)
 #'
 #' ### when there are ties, break the ties first
 #' nwts_all <- nwtsco
 #' nwts_all$trel <- nwtsco$trel + runif(dim(nwts_all)[1],0,1)*1e-8
-#' fit3 <- ah(Surv(trel,relaps) ~ age + instit, ties = F, data = nwts_all, robust = TRUE)
+#' fit3 <- ah(Surv(trel,relaps) ~ age + instit, ties = FALSE, data = nwts_all, robust = TRUE)
 #' summary(fit3)
 
 ah <- function(formula, data, robust, weights, ties, ...) {
@@ -155,4 +162,3 @@ ah <- function(formula, data, robust, weights, ties, ...) {
        class(fit) <- "ah"
        fit
      }
-

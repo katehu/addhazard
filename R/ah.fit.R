@@ -188,7 +188,8 @@ A=fit$D
 
 #for ( i in 1:eta.ncol){
 
-#  center<-Z[failure.time>= time.interval[i]]-		  #eta.each.person[failure.time>= time.interval[i]]
+#  center<-Z[failure.time>= time.interval[i]]
+# eta.each.person[failure.time>= time.interval[i]]
 
 #   idx1<-t>=  t.unique[i]
 #  rep.times<-sum(idx1)
@@ -325,7 +326,8 @@ return(fit)
 }
 
 
-residuals.ah<-function (object, type = c("martingale", "pseudoscore","pseudodfbeta","martingale.increment")){
+residuals.ah<-function (object, type = c("martingale", "pseudoscore",
+                        "pseudodfbeta","martingale.increment")){
 
   type <- match.arg(type)
   if (type=="martingale") return(object$M)
@@ -334,7 +336,8 @@ residuals.ah<-function (object, type = c("martingale", "pseudoscore","pseudodfbe
   #if (type=="martingale.increment"){
   # dM<-matrix(0,nrow=object$n.obs,ncol=object$eta.ncol)
   #for  ( i in 1: object$eta.ncol){
-  #    dM[object$match.eta<=i,] <- (object$censor-object$lambda0[i]-object$effects*object$t.diff[i])[object$match.eta<=i]
+  #    dM[object$match.eta<=i,] <- (object$censor-object$lambda0[i]
+  #                      -object$effects*object$t.diff[i])[object$match.eta<=i]
   #  }
   #return(dM)
   #}

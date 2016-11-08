@@ -1,28 +1,30 @@
 #' Prediction Based on the Additive Hazards Model Fitted from Two-phase Sampling
 #'
-#' This function predicts a subject's overall hazard rates at given time points based on this subject's covariate
-#' values. The prediction function is an object from \code{\link{ah.2ph}}. The  estimating procedures follow Hu (2014).
+#' This function predicts a subject's overall hazard rates at given time points
+#' based on this subject's covariate values. The prediction function is an object
+#' from \code{\link{ah.2ph}}. The  estimating procedures follow Hu (2014).
 #'
 #' @param object an object of class inhering from 'ah.2ph'.
 #' @param newdata a dataframe of an individual's predictors.
 #' @param newtime  a given sequence of time points at which the prediction is performed.
 #' @param ...  further arguments passed to or from other methods.
 #'
-#' @return A dataframe including the given time points, predicted hazards, their standard errors,
-#'      their variances, the phase I component of the variance for predicted hazards
-#'      and the phase II component of the variance.
+#' @return A dataframe including the given time points, predicted hazards, their
+#'  standard errors, their variances, the phase I component of the variance for
+#'  predicted hazards and the phase II component of the variance.
 #'
-#' @seealso \code{\link{ah.2ph}} for fitting the additive hazards model with two-phase sampling and
-#' \code{\link{nwtsco}} for the description of nwtsco dataset
+#' @seealso \code{\link{ah.2ph}} for fitting the additive hazards model with two-phase
+#   sampling and \code{\link{nwtsco}} for the description of nwtsco dataset
 #'
 #' @importFrom survival Surv
 #' @importFrom stats delete.response model.matrix terms
 #' @export
 #'
 #' @references
-#' Jie Hu (2014) A Z-estimation System for Two-phase Sampling with Applications to Additive Hazards Models and
-#' Epidemiologic Studies. Dissertation, University of Washington.
-#
+#' Jie Hu (2014) A Z-estimation System for Two-phase Sampling with Applications
+#'               to Additive Hazards Models and Epidemiologic Studies. Dissertation,
+#'               University of Washington.
+#'
 #' @examples
 #' library(survival)
 #' ### load data
@@ -43,7 +45,11 @@
 #' nwts$in.ph2 <-  rbinom(N, 1, nwts$Pi)
 #'
 #' ### fit an additive hazards model to  two-phase sampling data without calibration
-#' fit1 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts, R = in.ph2, Pi = Pi, ties = F, robust = FALSE)
+#' fit1 <- ah.2ph(Surv(trel,relaps) ~ age + histol,
+#'                data = nwts,
+#'                ties = FALSE,
+#'                R = in.ph2, Pi = Pi,
+#'                robust = FALSE)
 #'
 #' ###  input the new data for prediction
 #' newdata <- nwtsco[101,]
@@ -53,17 +59,19 @@
 #' ### fit an additve hazards model to  two-phase sampling data with calibration
 #' ### The calibration variable is stage
 #' fit2 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts, R = in.ph2, Pi = Pi,
-#'                                    ties = F, robust = FALSE, calibration.variables = "stage")
+#'                                    ties = FALSE, robust = FALSE, calibration.variables = "stage")
 #'
 #' ### based on the fitted model fit2, perform prediction at time points t =3 and t= 5
 #' predict(fit2, newdata, newtime = c(3,5))
 #'
-#' ### The calibration variable is stage
+#' \dontrun{
+#' ### The calibration variable is stage, when set robust = TRUE
 #' fit3 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts, R = in.ph2, Pi = Pi,
-#'                                    ties = F, robust = T, calibration.variables = "stage")
+#'                                    ties = FALSE, robust = TRUE, calibration.variables = "stage")
 #'
 #' ### based on the fitted model fit2, perform prediction at time points t =3 and t= 5
 #' predict(fit3, newdata, newtime = c(3,5))
+#' }
 
 predict.ah.2ph <- function(object, newdata, newtime, ...) {
 
@@ -93,13 +101,14 @@ predict.ah.2ph <- function(object, newdata, newtime, ...) {
     pred <- model.matrix(Terms, newdata)
     # delete the intercept
     pred <- as.numeric(pred[, -1])
-    ###################################################################################
+    ###########################################################################
 
     Pi.pha2 <- object$Pi.pha2
 
     if (object1$robust) {
-        stop("When you set robust = FALSE, you assume the additive hazards model is not the true model.
-             Prediction based on this model is no longer valid. We stop the prediction process. ")
+        stop("When you set robust = FALSE, you assume the additive hazards model
+             is not the true model. Prediction based on this model is no longer valid.
+             We stop the prediction process. ")
     } else {
          ## No calibration
         if (!length(object$calibration.variables)) {
@@ -122,8 +131,9 @@ predict.ah.2ph <- function(object, newdata, newtime, ...) {
 
                 # newtime s is less than t_1, then we report
                 if (newtime[i] < t.unique[1]) {
-                  print(paste("The data used for building the ah model does not have enough information for predicting such a small t, t=",
-                    newtime[i]))
+                  print(paste("The data used for building the ah model does not have
+                               enough information for predicting such a small t, t=",
+                              newtime[i]))
                 } else {
 
                   # find the position of newtime[i] on the original timeline
@@ -180,8 +190,9 @@ predict.ah.2ph <- function(object, newdata, newtime, ...) {
             for (i in 1:length(newtime)) {
                 # newtime s is less than t_1, then we report
                 if (newtime[i] < t.unique[1]) {
-                  print(paste("The data used for building the ah model does not have enough information for predicting such a small t, t=",
-                    newtime[i]))
+                  print(paste("The data used for building the ah model does not
+                               have enough information for predicting such a small t, t=",
+                              newtime[i]))
                 } else {
 
                   # find the position of newtime[i] on the original timeline
@@ -199,8 +210,8 @@ predict.ah.2ph <- function(object, newdata, newtime, ...) {
 
 
 
-            ##################### Calculate the variance of the predicted value See page 109
-            ##################### of Jie Hu' thesis for the detailed formula
+            ###Calculate the variance of the predicted value See page 109 ####
+            #### of Jie Hu' thesis for the detailed formula #######
 
 
 

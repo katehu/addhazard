@@ -22,7 +22,7 @@ print.summary.ah <- function(x, digits = max(getOption("digits") -
     print(x$call)
     cat("\n")
     printCoefmat(x$coefficients, digits = digits, signif.stars = signif.stars,
-        P.value=TRUE,  has.Pvalue=TRUE, ...)
+        P.values = TRUE,  has.Pvalue=TRUE, ...)
 }
 
 #' @export
@@ -40,10 +40,7 @@ summary.ah.2ph <- function(object, ...) {
     res
 }
 
-# print.summary.ah.2ph<- function(object, ...){
-# cat('Call:\n') print(object$call) cat('\n')
-# printCoefmat(object$coefficients, P.value=TRUE,
-# has.Pvalue=TRUE, digits = 5) }
+
 
 #' @export
 print.summary.ah.2ph <- function(x, digits = max(getOption("digits") -
@@ -51,6 +48,6 @@ print.summary.ah.2ph <- function(x, digits = max(getOption("digits") -
     cat("Call:\n")
     print(x$call)
     cat("\n")
-    printCoefmat(x$coefficients, digits = digits, signif.stars = signif.stars, P.value=TRUE,
+    printCoefmat(x$coefficients, digits = digits, signif.stars = signif.stars, P.values = TRUE,
         has.Pvalue=TRUE, ...)
 }
