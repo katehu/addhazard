@@ -1,7 +1,9 @@
 #######################################################
 # Author: Kate HU
-# Date: July 27th, 2016
+# Date: July 27th, 2017
 # Task: update documentation for breaking ties
+# Date: March 20, 2017
+# Task: importFrom stats model.weight
 # To do: Tie handling
 #######################################################
 
@@ -41,7 +43,7 @@
 #'                              Biometrika; 81:61-71.
 #'
 #' @importFrom survival Surv
-#' @importFrom stats residuals model.matrix model.extract terms
+#' @importFrom stats residuals model.weights model.matrix model.extract terms
 #' @export
 #'
 #' @examples
