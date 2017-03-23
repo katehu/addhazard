@@ -2,11 +2,11 @@
 # Author: Kate HU
 # Date: July 27th, 2016
 # Task: write function when assuming there may be ties
+# Date: March 20, 2017
+# Task: change censor variable name to "event"
 # To do: interval censoring
 #######################################################
-
-require("ahaz")
-require("matrix")
+#' @import ahaz
 
 ah.fit<-function(Y,Z,wts,robust){
 
@@ -19,10 +19,10 @@ ah.fit<-function(Y,Z,wts,robust){
   }
 
   t.fail <- Y[,1]
-  event <- Y[,2]
+  event <- Y[,2] # 1 means death and 0 means censored
   if (missing(wts) || is.null(wts)) wts <- rep(1, n.obs)
 
-  scale( Z,center= rep(1,n.par),scale=F)
+  scale(Z, center = rep(1,n.par),scale=F)
   # some statistics about time points----------------------------------------
   # ordering time based on 1st: failure time and 2nd: events
   new.order <- order(Y[,1], Y[,2])
@@ -58,7 +58,7 @@ ah.fit<-function(Y,Z,wts,robust){
   # count cumulative total Z lost for each duration
   Z.cumsum.lost.in.dur <- cumsum(c(0, Z.sum.lost.at.t.marks))
   # count cumulative total Z for each duration
-  Z.cumsum.in.dur <- sum(Z) - Z.sumcum.lost.in.interval
+  Z.cumsum.in.dur <- sum(Z) - Z.cumsum.lost.in.dur
 
   # divide the timeline to small intervals
   t.diff <- t.marks- c(0,t.marks[-n.t.marks])
@@ -74,7 +74,7 @@ ah.fit<-function(Y,Z,wts,robust){
   h <- n.events.at.t.marks/n.in.dur[-(n.t.marks+1)]
   h.cum <- cumsum(h)
   # Lambda starts from t1 and ends right before T
-  Lambda <- h.cum[-n.in.marks] - eta.cum[-1] * theta
+  Lambda <- h.cum[-n.t.marks] - eta.cum[-1] * theta
 
 
 
@@ -126,7 +126,7 @@ for ( i in seq_along(eta.ncol)){
   idx1 <- t.fail >= t.unique[i]
   idx2 <- which(t.fail == t.unique[i])
 
-  n.death[i] <- sum((censor*wts)[idx2])
+  n.death[i] <- sum((event*wts)[idx2])
   eta.den.vec[i]<-sum(wts[idx1])
 
   for (j in 1:n.par){
@@ -136,7 +136,7 @@ for ( i in seq_along(eta.ncol)){
     ### calculate the cumulative eta
     ### The sum of Z of the subjests who have died at the jth dicrete time
 
-    z.death[j,i]<-sum((Z[,j]*censor*wts)[idx2])
+    z.death[j,i]<-sum((Z[,j]*event*wts)[idx2])
   }
   eta.den[,i]<-eta.den.vec[i]
 }
@@ -173,7 +173,7 @@ eta.i<-matrix(as.vector(eta[,match.eta]),ncol=n.par,byrow=TRUE)
 ###Calculate theta.numerator
 
 
-# z.cen.1<-(Z-eta.i)*wts*censor
+# z.cen.1<-(Z-eta.i)*wts*event
 A=fit$D
 
 
@@ -257,7 +257,6 @@ fit<-list(coef=theta,
           iA=iA,
           eta=eta,
           eta.cum=eta.cum,
-          z.cen.1=z.cen.1,
           match.eta=match.eta,
           eta.i=eta.i,
           eta.den.vec=eta.den.vec,
@@ -267,7 +266,7 @@ fit<-list(coef=theta,
           z.death=z.death,
           n.death=n.death,
           eta.ncol=eta.ncol,
-          censor=censor,
+          event=event,
           time=t,
           t.diff=t.diff,
           t.unique=t.unique,
@@ -280,7 +279,7 @@ Lambda0<-cumsum(lambda0)
 
 
 
-M<-(censor-Lambda0[match.eta]-effects*t)
+M<-(event-Lambda0[match.eta]-effects*t)
 
 
 
@@ -291,7 +290,7 @@ eta.resid2<-apply(t(eta)*lambda0,2,cumsum)
 eta.resid3<-eta.cum[match.eta,]*effects
 
 
-eta.resid<-eta.i*censor-eta.resid2[match.eta,]-eta.resid3
+eta.resid<-eta.i*event-eta.resid2[match.eta,]-eta.resid3
 
 ###nobs x n.par
 z.cen.resid<-(z.resid-eta.resid)
@@ -336,7 +335,7 @@ residuals.ah<-function (object, type = c("martingale", "pseudoscore",
   #if (type=="martingale.increment"){
   # dM<-matrix(0,nrow=object$n.obs,ncol=object$eta.ncol)
   #for  ( i in 1: object$eta.ncol){
-  #    dM[object$match.eta<=i,] <- (object$censor-object$lambda0[i]
+  #    dM[object$match.eta<=i,] <- (object$event-object$lambda0[i]
   #                      -object$effects*object$t.diff[i])[object$match.eta<=i]
   #  }
   #return(dM)
