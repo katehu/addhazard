@@ -1,16 +1,20 @@
 #######################################################
 # Author: Kate HU
-# Date: July 27th, 2016
+# Date: March 13th, 2017
 # Task: Generate nwts2ph example dataset
 #######################################################
+#' This file genreate the example dataset nwts2ph
 #' importFrom("stats", "rbinom")
+#' @param data the full cohort data
+#' @param seed the random seed we use for generating this dataset
+#' @importFrom stats rbinom
 #' @export nwts2ph.generate
-nwts2ph.generate <- function(nwtsco, seed = 20){
+nwts2ph.generate <- function(data, seed = 20){
 	# Create a hypothetical two-phase sampling (stratified sampling) dataset.
 	# In this dataset, only people who have relapse and some of the controls have
 	# their samples sent to the central laboratory for histology determination
 	set.seed(seed)
-  nwts2ph <- nwtsco
+  nwts2ph <- data
 
 	# Institutional histology is examined in the local hospital thus
 	# it is reasonable to assume it is measured for all the samples.

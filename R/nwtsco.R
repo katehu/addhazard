@@ -28,7 +28,7 @@
 #' \item{specwgt}{Weight of tumor bearing specimen, in grams (continuous)}
 #' \item{tumdiam}{Diameter of tumor, in centimeters (continuous)}
 #' }
-#' @source \url{http://faculty.washington.edu/norm/datasets/nwts-share.txt}
+#' @source
 #'  Originally used by M. Kulich and D.Y. Lin:
 #'  Improving the efficiency of relative-risk estimation in case-cohort studies.
 #'  J Amer Statis Assoc 99:832-844, 2004.

@@ -1,8 +1,11 @@
 #######################################################
 # Author: Kate HU
 # Date: July 27th, 2016
-# Task: update finite sampling
-# To do: Interval censoring
+# Task: update finite sampling documentation
+# Date: March 30th, 2017
+#       clear problems in calling wts.pha2 and wts.cal
+# To do: Interval censoring and add finite sampling argument
+#        in the function
 #######################################################
 #' Fit Additive Hazards Regression Models to Two-phase Sampling
 #'
@@ -46,12 +49,12 @@
 #' ### fit an additive hazards model to two-phase sampling data without calibration
 #' nwts2ph$trel <- nwts2ph$trel + runif(dim(nwts2ph)[1],0,1)*1e-8
 #' fit1 <- ah.2ph(Surv(trel,relaps) ~ age + histol, ties = FALSE, data = nwts2ph, R = in.ph2, Pi = Pi,
-#'                                  robust = FALSE,  calibration.variables = NULL)
+#'  robust = FALSE,  calibration.variables = NULL)
 #' summary(fit1)
 #'
 #' ### fit an additve hazards model with calibration on age
 #' fit2 <- ah.2ph(Surv(trel,relaps) ~ age + histol, ties = FALSE, data = nwts2ph, R = in.ph2, Pi = Pi,
-#'                                    robust = FALSE, calibration.variables = "age")
+#'  robust = FALSE, calibration.variables = "age")
 #' summary(fit2)
 #'
 #' ### calibrate on age square
@@ -104,13 +107,17 @@ ah.2ph <- function(formula, data, R, Pi, ties, robust = FALSE,
     calibration.variables = data[, calibration.variables]
     Pi.pha2 <- Pi[R == 1]
     data.pha2 <- data[R == 1, ]
-    data.pha2$wts.pha2 <- as.numeric(1/Pi.pha2)
+    wts.pha2 <- as.numeric(1/Pi.pha2)
+    data.pha2$wts.pha2 <- wts.pha2
 
     if (!length(calibration.variables)) {
 
         # Use the new weights and fit the model to the data
-        fit.A <- ah(formula, ties = ties, data = data.pha2, robust = robust,
-            weights = wts.pha2)
+        # In ahaz, weights is extracted from data by calling the column name
+        # Thus the varible name assigned to weights  has to to included in
+        # the column name of data
+        fit.A <- ah(formula, data = data.pha2, robust = robust,
+            weights =  wts.pha2,  ties = ties)
         resid <- fit.A$resid
         temp <- resid * sqrt(1 - Pi.pha2)
         temp1 <- resid * sqrt(Pi.pha2)
@@ -119,11 +126,10 @@ ah.2ph <- function(formula, data, R, Pi, ties, robust = FALSE,
         P <- t(aux) %*% (aux)
         aux.pha2 <- aux[R == 1, ]
         wts.cal <- cook.wts.cal(aux = aux, aux.pha2 = aux.pha2,
-            P = P, wts.pha2 = data.pha2$wts.pha2)
-        data.pha2$wts.pha2 <- wts.cal
-
-        fit.A <- ah(formula, ties = ties, data = data.pha2, robust = robust,
-            weights = wts.pha2)
+            P = P, wts.pha2 = wts.pha2)
+        data.pha2$wts.cal <- wts.cal
+        fit.A <- ah(formula, data = data.pha2, robust = robust,
+            weights = wts.cal, ties = ties)
         resid <- fit.A$resid
         temp1 <- resid * sqrt(1/wts.cal)
         # multiplied by sqrt(wts.cal) because Qf= sum wts.cal*f
@@ -150,7 +156,7 @@ ah.2ph <- function(formula, data, R, Pi, ties, robust = FALSE,
     fit$var.tot <- var.pha1 + var.pha2
     fit$se <- sqrt(diag(var.tot))
     fit$Pi.pha2 <- Pi.pha2
-    fit$wts.pha2 <- data.pha2$wts.pha2
+    fit$wts.pha2 <- wts.pha2
     fit$calibration.variables <- calibration.variables
     fit$R <- R
     fit$call <- Call
