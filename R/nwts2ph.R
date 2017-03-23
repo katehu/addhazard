@@ -52,7 +52,7 @@
 #'              1 = selected into the phase II subsample,
 #'              0 = not selected into the phase II subsample}
 #'   }
-#' @source \url{http://faculty.washington.edu/norm/datasets/nwts-share.txt}
+#' @source
 #'  This dataset was created based on \link{nwtsco} dataset from the National Wilms Tumor Study (NWTS)
 #' @docType data
 #' @keywords datasets
