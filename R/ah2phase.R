@@ -22,6 +22,8 @@
 #' @param calibration.variables  a vector of some column names of the data.
 #'  These are the  variables available for every observation. They are used to
 #'  calibrate the weight assigned to each subject in order to improve estimation efficiency.
+#' @param seed an integer. Seed number used to generate random increment when 
+#'        breaking ties. The default number is 20. 
 #' @param ...\tadditional arguments to be passed to the low level regression fitting
 #'  functions.
 #' @return An object of class 'ah.2h' representing the fit.
@@ -95,12 +97,12 @@
 #'                                    calibration.variables = c('strt1','strt2','strt3'))
 #' summary(fit4)
 
-ah.2ph <- function(formula, data, R, Pi = NULL, weights = NULL, ties, robust = FALSE, calibration.variables = NULL, 
+ah.2ph <- function(formula, data, R, Pi = NULL, weights = NULL, ties, robust = FALSE, calibration.variables = NULL, seed = 20,
     ...) {
     Call <- match.call()
     R = data[, as.character(Call[["R"]])]
     data.pha2 <- data[R == 1, ]
-    calibration.variables = data[, as.character(Call[["calibration.variables"]])]
+    cal.var = data[, calibration.variables]
     if (!is.null(Call[["weights"]])) {
         weights = data[, as.character(Call[["weights"]])]
         wts.pha2 = weights[R == 1]
@@ -120,7 +122,7 @@ ah.2ph <- function(formula, data, R, Pi = NULL, weights = NULL, ties, robust = F
         # Use the new weights and fit the model to the data In ahaz, weights is extracted from data by
         # calling the column name Thus the varible name assigned to weights has to to included in the column
         # name of data
-        fit.A <- ah(formula, data = data.pha2, robust = robust, weights = weights, ties = ties)
+        fit.A <- ah(formula, data = data.pha2, robust = robust, weights = weights, seed = seed, ties = ties)
         resid <- fit.A$resid
         temp <- resid * sqrt(1 - Pi.pha2)
         temp1 <- resid * sqrt(Pi.pha2)

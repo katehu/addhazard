@@ -22,6 +22,8 @@
 #' @param robust a logical variable.  Robust standard errors are provided if
 #'  robust == TRUE.
 #' @param weights  a numeric vector. The weight of each observation.
+#' @param seed an integer. Seed number used to generate random increment when 
+#'        breaking ties. The default number is 20. 
 #' @param ... additional arguments to be passed to the low level regression
 #'  fitting functions.
 #'
@@ -67,7 +69,6 @@
 #' summary(fit3)
 
 ah <- function(formula, data, robust, weights, ties, seed = 20, ...) {
-    
     Call <- match.call()
     indx <- match(c("formula", "data", "weights"), names(Call), nomatch = 0)
     if (indx[1] == 0) 
@@ -104,7 +105,7 @@ ah <- function(formula, data, robust, weights, ties, seed = 20, ...) {
                        The default seed number is 20."))
         } else if (ties == "break") {
             set.seed(seed)
-            Y[, "time"] = runif(dim(Y)[1], 0, 1) * 1e-08 + Y[, "time"]
+            Y[, "time"] = runif(dim(Y)[1], 0, 1) * 1e-10 + Y[, "time"]
         }
     }
     
