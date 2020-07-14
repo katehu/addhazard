@@ -19,9 +19,9 @@
 #'  The subject is selected to phase II if R = 1.
 #' @param Pi  the  probability of a subject to be selected to the phase II subsample.
 #' @param robust a logical variable.  Robust standard errors are provided if robust = TRUE.
-#' @param calibration.variables  a vector of some column names of the data.
-#'  These are the  variables available for every observation. They are used to
-#'  calibrate the weight assigned to each subject in order to improve estimation efficiency.
+#' @param calibration.variables  a vector of strings of some column names of the data.
+#'  These are the variables available for every observation. They are used to
+#'  calibrate the weight assigned to each subject 
 #' @param seed an integer. Seed number used to generate random increment when 
 #'        breaking ties. The default number is 20. 
 #' @param ...\tadditional arguments to be passed to the low level regression fitting
@@ -127,7 +127,7 @@ ah.2ph <- function(formula, data, R, Pi = NULL, weights = NULL, ties, robust = F
         temp <- resid * sqrt(1 - Pi.pha2)
         temp1 <- resid * sqrt(Pi.pha2)
     } else {
-        aux <- as.matrix(calibration.variables)
+        aux <- as.matrix(cal.var)
         P <- t(aux) %*% (aux)
         aux.pha2 <- aux[R == 1, ]
         wts.cal <- cook.wts.cal(aux = aux, aux.pha2 = aux.pha2, P = P, wts.pha2 = wts.pha2)
