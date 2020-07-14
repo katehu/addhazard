@@ -33,9 +33,11 @@
 #'
 #' @note
 #' This function estimates both model-based and robust standard errors. It can be
-#' used to analyze case-cohort studies. It allows subsampling among cases. It can
-#' incorporate the calibration procedure and analyze the combined dataset of phase
-#' I and phase II samples.
+#' used to analyze case-cohort studies with subsampling among cases. It allows
+#' weight calibration with auxiliary information from the full cohort (phase I sample).
+#' By this means, more information is used and thus weight calibration potentially 
+#' could further improve the precision of prediction or our estimation on the 
+#' regression coefficients.
 #'
 #' @seealso \code{\link{predict.ah.2ph}} for prediction based on fitted additive
 #' hazards model with two-phase sampling and \code{\link{nwtsco}} for the description
