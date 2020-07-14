@@ -101,91 +101,91 @@
 #' summary(fit4)
 
 ah.2ph <- function(formula, data, R, Pi = NULL, weights = NULL, ties, robust = FALSE, calibration.variables = NULL, seed = 20,
-    ...) {
-    Call <- match.call()
-    R = data[, as.character(Call[["R"]])]
-    data.pha2 <- data[R == 1, ]
-    cal.var = data[, calibration.variables]
-    if (!is.null(Call[["weights"]])) {
-        weights = data[, as.character(Call[["weights"]])]
-        wts.pha2 = weights[R == 1]
-        Pi.pha2 = 1/wts.pha2
-        data.pha2$weights = wts.pha2
-    } else if (is.null(Call[["weights"]]) & !is.null(Call[["Pi"]])) {
-        # only when weight variables are not given, we use selection prob to generate weights
-        Pi = data[, as.character(Call[["Pi"]])]
-        Pi.pha2 <- Pi[R == 1]
-        # Pi.pha2 won't be zero otherwise the subject will be selected to the phase II
-        wts.pha2 <- as.numeric(1/Pi.pha2)
-        data.pha2$weights <- wts.pha2
-    } else if (is.null(Call[["weights"]]) & is.null(Call[["Pi"]])) 
-        stop("inputs for selection probability Pi and weights R are both NULL")
-    
-    if (!length(calibration.variables)) {
-        # Use the new weights and fit the model to the data In ahaz, weights is extracted from data by
-        # calling the column name Thus the varible name assigned to weights has to to included in the column
-        # name of data
-        fit.A <- ah(formula, data = data.pha2, robust = robust, weights = weights, seed = seed, ties = ties)
-        resid <- fit.A$resid
-        temp <- resid * sqrt(1 - Pi.pha2)
-        temp1 <- resid * sqrt(Pi.pha2)
-    } else {
-        aux <- as.matrix(cal.var)
-        P <- t(aux) %*% (aux)
-        aux.pha2 <- aux[R == 1, ]
-        wts.cal <- cook.wts.cal(aux = aux, aux.pha2 = aux.pha2, P = P, wts.pha2 = wts.pha2)
-        data.pha2$wts.cal <- wts.cal
-        fit.A <- ah(formula, data = data.pha2, robust = robust, weights = wts.cal, ties = ties)
-        resid <- fit.A$resid
-        temp1 <- resid * sqrt(1/wts.cal)
-        # multiplied by sqrt(wts.cal) because Qf= sum wts.cal*f
-        Q <- t(aux.pha2 * sqrt(wts.cal)) %*% (resid/sqrt(wts.cal))
-        # and resid already weighted by wts.cal
-        resid.adj <- resid - (aux.pha2 %*% solve(P) %*% Q) * wts.cal
-        temp <- resid.adj * sqrt((1 - Pi.pha2)/(Pi.pha2 * wts.cal))
-    }
-    var.pha1 <- fit.A$var
-    iA <- fit.A$iA
-    if (robust == TRUE) {
-        var.pha1 <- iA %*% t(temp1) %*% temp1 %*% iA
-    }
-    var.pha2 <- iA %*% t(temp) %*% temp %*% iA
-    var.tot <- var.pha1 + var.pha2
-    fit <- NULL
-    fit$coef <- fit.A$coef
-    fit$var.pha1 <- var.pha1
-    fit$var.pha2 <- var.pha2
-    fit$var.tot <- var.pha1 + var.pha2
-    fit$se <- sqrt(diag(var.tot))
-    fit$Pi.pha2 <- Pi.pha2
-    fit$wts.pha2 <- wts.pha2
-    fit$calibration.variables <- calibration.variables
-    fit$R <- R
-    fit$call <- Call
-    fit$fit.pha1 <- fit.A
-    class(fit) <- "ah.2ph"
-    fit
+                   ...) {
+  Call <- match.call()
+  R = data[, as.character(Call[["R"]])]
+  data.pha2 <- data[R == 1, ]
+  cal.var = data[, calibration.variables]
+  if (!is.null(Call[["weights"]])) {
+    weights = data[, as.character(Call[["weights"]])]
+    wts.pha2 = weights[R == 1]
+    Pi.pha2 = 1/wts.pha2
+    data.pha2$weights = wts.pha2
+  } else if (is.null(Call[["weights"]]) & !is.null(Call[["Pi"]])) {
+    # only when weight variables are not given, we use selection prob to generate weights
+    Pi = data[, as.character(Call[["Pi"]])]
+    Pi.pha2 <- Pi[R == 1]
+    # Pi.pha2 won't be zero otherwise the subject will be selected to the phase II
+    wts.pha2 <- as.numeric(1/Pi.pha2)
+    data.pha2$weights <- wts.pha2
+  } else if (is.null(Call[["weights"]]) & is.null(Call[["Pi"]])) 
+    stop("inputs for selection probability Pi and weights R are both NULL")
+  
+  if (!length(calibration.variables)) {
+    # Use the new weights and fit the model to the data In ahaz, weights is extracted from data by
+    # calling the column name Thus the varible name assigned to weights has to to included in the column
+    # name of data
+    fit.A <- ah(formula, data = data.pha2, robust = robust, weights = weights, seed = seed, ties = ties)
+    resid <- fit.A$resid
+    temp <- resid * sqrt(1 - Pi.pha2)
+    temp1 <- resid * sqrt(Pi.pha2)
+  } else {
+    aux <- as.matrix(cal.var)
+    P <- t(aux) %*% (aux)
+    aux.pha2 <- aux[R == 1, ]
+    wts.cal <- cook.wts.cal(aux = aux, aux.pha2 = aux.pha2, P = P, wts.pha2 = wts.pha2)
+    data.pha2$wts.cal <- wts.cal
+    fit.A <- ah(formula, data = data.pha2, robust = robust, weights = wts.cal, ties = ties)
+    resid <- fit.A$resid
+    temp1 <- resid * sqrt(1/wts.cal)
+    # multiplied by sqrt(wts.cal) because Qf= sum wts.cal*f
+    Q <- t(aux.pha2 * sqrt(wts.cal)) %*% (resid/sqrt(wts.cal))
+    # and resid already weighted by wts.cal
+    resid.adj <- resid - (aux.pha2 %*% solve(P) %*% Q) * wts.cal
+    temp <- resid.adj * sqrt((1 - Pi.pha2)/(Pi.pha2 * wts.cal))
+  }
+  var.pha1 <- fit.A$var
+  iA <- fit.A$iA
+  if (robust == TRUE) {
+    var.pha1 <- iA %*% t(temp1) %*% temp1 %*% iA
+  }
+  var.pha2 <- iA %*% t(temp) %*% temp %*% iA
+  var.tot <- var.pha1 + var.pha2
+  fit <- NULL
+  fit$coef <- fit.A$coef
+  fit$var.pha1 <- var.pha1
+  fit$var.pha2 <- var.pha2
+  fit$var.tot <- var.pha1 + var.pha2
+  fit$se <- sqrt(diag(var.tot))
+  fit$Pi.pha2 <- Pi.pha2
+  fit$wts.pha2 <- wts.pha2
+  fit$calibration.variables <- calibration.variables
+  fit$R <- R
+  fit$call <- Call
+  fit$fit.pha1 <- fit.A
+  class(fit) <- "ah.2ph"
+  fit
 }
 
 ############# calculate the new weight #####################################
 cook.wts.cal <- function(aux, aux.pha2, P, wts.pha2) {
-    if (!is.matrix(aux.pha2)) 
-        aux.pha2 <- as.matrix(aux.pha2)
-    aux.tot <- apply(aux, 2, sum)
-    aux.tot.pha2 <- apply(aux.pha2 * wts.pha2, 2, sum)
-    ### phase I total, 1 x q
-    L0 <- solve(P) %*% (aux.tot.pha2 - aux.tot)
-    model.calibration <- function(L) {
-        F <- NULL
-        wts.fish <- as.vector(exp(-aux.pha2 %*% L) * wts.pha2)
-        for (i in 1:dim(aux)[2]) {
-            F[i] <- sum(wts.fish * aux.pha2[, i]) - aux.tot[i]
-        }
-        F
+  if (!is.matrix(aux.pha2)) 
+    aux.pha2 <- as.matrix(aux.pha2)
+  aux.tot <- apply(aux, 2, sum)
+  aux.tot.pha2 <- apply(aux.pha2 * wts.pha2, 2, sum)
+  ### phase I total, 1 x q
+  L0 <- solve(P) %*% (aux.tot.pha2 - aux.tot)
+  model.calibration <- function(L) {
+    F <- NULL
+    wts.fish <- as.vector(exp(-aux.pha2 %*% L) * wts.pha2)
+    for (i in 1:dim(aux)[2]) {
+      F[i] <- sum(wts.fish * aux.pha2[, i]) - aux.tot[i]
     }
-    eval <- rootSolve::multiroot(model.calibration, start = L0)
-    L <- eval$root
-    # est.acc<-eval$est.acc
-    wts.cal <- as.vector(exp(-aux.pha2 %*% L) * wts.pha2)
-    return(wts.cal)
+    F
+  }
+  eval <- rootSolve::multiroot(model.calibration, start = L0)
+  L <- eval$root
+  # est.acc<-eval$est.acc
+  wts.cal <- as.vector(exp(-aux.pha2 %*% L) * wts.pha2)
+  return(wts.cal)
 }
