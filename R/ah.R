@@ -18,10 +18,11 @@
 #'  response ~ predictors. The outcome is a survival object created by
 #'  \code{\link[survival]{Surv}}.
 #' @param data  a data frame. Input dataset.
-#' @param ties a logical variable. FALSE if there are no ties in the censored failure times.
 #' @param robust a logical variable.  Robust standard errors are provided if
 #'  robust == TRUE.
 #' @param weights  a numeric vector. The weight of each observation.
+#' @param ties a string. If there are ties in the survival time, when ties = 'break'
+#'        a small random number is added to the survival time to break the ties.
 #' @param seed an integer. Seed number used to generate random increment when 
 #'        breaking ties. The default number is 20. 
 #' @param ... additional arguments to be passed to the low level regression
@@ -30,9 +31,7 @@
 #' @return An object of class 'ah' representing the fit.
 #'
 #' @note
-#'  The response variable is a survival object. If there are ties in the
-#'  survival time, in the current version we recommend users to break ties by adding
-#'  a small random number to the survival time. An example is provided.  The regression
+#'  The response variable is a survival object. The regression
 #'  model can be univariate or multivariate. This package is built upon the function
 #'  \code{\link[ahaz]{ahaz}} by Anders Gorst-Rasmussen.
 #'
@@ -55,17 +54,20 @@
 #'
 #' ### fit the additive hazards model to the data
 #' ### the model-based standard errors are reported when setting robust = FALSE
-#' fit1 <- ah(Surv(trel,relaps) ~ age + instit, ties = FALSE, data = nwts, robust = FALSE)
+#' fit1 <- ah(Surv(trel,relaps) ~ age + instit, data = nwts, robust = FALSE)
 #' summary(fit1)
 #'
 #' ### fit the additive hazards model to the data with robust standard errors
-#' fit2 <- ah(Surv(trel,relaps) ~ age + instit, ties = FALSE, data = nwts, robust = TRUE)
+#' fit2 <- ah(Surv(trel,relaps) ~ age + instit, data = nwts, robust = TRUE)
 #' summary(fit2)
 #'
-#' ### when there are ties, break the ties first
+#' ### when there are ties, break the ties by setting ties = 'break'
 #' nwts_all <- nwtsco
-#' nwts_all$trel <- nwtsco$trel + runif(dim(nwts_all)[1],0,1)*1e-8
-#' fit3 <- ah(Surv(trel,relaps) ~ age + instit, ties = FALSE, data = nwts_all, robust = TRUE)
+#' fit3 <- ah(Surv(trel,relaps) ~ age + instit, ties = 'break', data = nwts_all, robust = TRUE)
+#' summary(fit3)
+#' ### users could break the ties on their own by
+#' nwts_all$trel <- nwtsco$trel + runif(dim(nwts_all)[1],0,1)*1e-10
+#' fit3 <- ah(Surv(trel,relaps) ~ age + instit, data = nwts_all, robust = TRUE)
 #' summary(fit3)
 
 ah <- function(formula, data, robust, weights, ties, seed = 20, ...) {
@@ -99,10 +101,10 @@ ah <- function(formula, data, robust, weights, ties, seed = 20, ...) {
     
     if (any(duplicated(Y[Y[, "status"] == 1, "time"]))) {
         if (missing(ties) || ties != "break" || is.null(ties)) {
-            stop(paste("There are ties in the survival time. Consider add an argument
-                       ties = 'break' in the function call. The program will break ties
-                       by adding a small random number to the survival time.
-                       The default seed number is 20."))
+            stop(paste("There are ties in the survival time. Consider adding
+                       an argument ties = 'break' in the function call. 
+                       The program will break ties by adding a small random number 
+                       to the survival time. The default seed number is 20."))
         } else if (ties == "break") {
             set.seed(seed)
             Y[, "time"] = runif(dim(Y)[1], 0, 1) * 1e-10 + Y[, "time"]
