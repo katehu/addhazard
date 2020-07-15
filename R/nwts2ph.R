@@ -48,6 +48,7 @@
 #'              0.5 for strata =1,
 #'              0.9 for strata = 2,
 #'              0.9 for strata = 3}
+#' \item{wts}{weight assigned to each individual, inverse of the selection probability}
 #' \item{in.ph2}{Phase II membership,
 #'              1 = selected into the phase II subsample,
 #'              0 = not selected into the phase II subsample}
