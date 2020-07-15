@@ -1,5 +1,12 @@
 # addhazard
 
+addhazard 1.2.0 updates:
+1. allow either weight or selection probability to be the input argument
+2. add row names for coefs in the summary table
+3. break ties for users when ties = 'break'
+4. generate wts variable in the example nwts dataset
+5. add nwts2ph dataset, a hypothetical two-phase sampling based on nwts
+
 addhazard 1.1.0 updates:
 
 1. add a two-phase sampling example dataset, nwts.2ph.rda, to the data folder
