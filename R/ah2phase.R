@@ -17,6 +17,7 @@
 #' @param R  a phase II membership indicator. A vector of values of 0 and 1.
 #'  The subject is selected to phase II if R = 1.
 #' @param Pi  the  probability of a subject to be selected to the phase II subsample.
+#' @param weights weight assigned to each individual, inverse of the selection probability
 #' @param robust a logical variable.  Robust standard errors are provided if robust = TRUE.
 #' @param calibration.variables  a vector of strings of some column names of the data.
 #'  These are the variables available for every observation. They are used to
@@ -25,7 +26,7 @@
 #'        a small random number is added to the survival time to break the ties.
 #' @param seed an integer. Seed number used to generate random increment when 
 #'        breaking ties. The default number is 20. 
-#' @param ...\tadditional arguments to be passed to the low level regression fitting
+#' @param ... additional arguments to be passed to the low level regression fitting
 #'  functions.
 #' @return An object of class 'ah.2h' representing the fit.
 #' @importFrom survival Surv
@@ -50,7 +51,12 @@
 #' @examples
 #' library(survival)
 #' ### fit an additive hazards model to two-phase sampling data without calibration
-#' fit1 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts2ph, R = in.ph2, Pi = Pi, wts = NULL, 
+#' fit1 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts2ph, R = in.ph2, Pi = Pi,
+#'  robust = FALSE,  ties = 'break')
+#' summary(fit1)
+#' 
+#' ### use weight instead of the selection probability Pi in the input
+#' fit1 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts2ph, R = in.ph2, weights = wts,
 #'  robust = FALSE,  ties = 'break')
 #' summary(fit1)
 #'
@@ -60,11 +66,11 @@
 #' summary(fit2)
 #'
 #' ### calibrate on age square
-#' ### note if users create a  calibration variable, then
+#' ### note if users create a calibration variable, then
 #' ### the new variable should be added to the original data frame
 #' nwts2ph$age2 <- nwts2ph$age^2
-#' fit3 <- ah.2ph(Surv(trel,relaps) ~ age + histol, ties = FALSE, data = nwts2ph, 
-#' R = in.ph2, Pi = Pi, robust = FALSE, ties = 'break', calibration.variables = 'age2')
+#' fit3 <- ah.2ph(Surv(trel,relaps) ~ age + histol,  data = nwts2ph, 
+#'  R = in.ph2, Pi = Pi, robust = FALSE, ties = 'break', calibratio.variables = 'age2')
 #' summary(fit3)
 #'
 #' #############################################################################
@@ -121,6 +127,7 @@ ah.2ph <- function(formula, data, R, Pi = NULL, weights = NULL, ties, robust = F
   } else if (is.null(Call[["weights"]]) & is.null(Call[["Pi"]])) 
     stop("inputs for selection probability Pi and weights R are both NULL")
   
+  fit <- NULL
   if (!length(calibration.variables)) {
     # Use the new weights and fit the model to the data In ahaz, weights is extracted from data by
     # calling the column name Thus the varible name assigned to weights has to to included in the column
@@ -151,7 +158,7 @@ ah.2ph <- function(formula, data, R, Pi = NULL, weights = NULL, ties, robust = F
   }
   var.pha2 <- iA %*% t(temp) %*% temp %*% iA
   var.tot <- var.pha1 + var.pha2
-  fit <- NULL
+
   fit$coef <- fit.A$coef
   fit$var.pha1 <- var.pha1
   fit$var.pha2 <- var.pha2
@@ -159,10 +166,10 @@ ah.2ph <- function(formula, data, R, Pi = NULL, weights = NULL, ties, robust = F
   fit$se <- sqrt(diag(var.tot))
   fit$Pi.pha2 <- Pi.pha2
   fit$wts.pha2 <- wts.pha2
-  fit$calibration.variables <- calibration.variables
+  fit$calibration.variables <- cal.var
   fit$R <- R
   fit$call <- Call
-  fit$fit.pha1 <- fit.A
+  fit$fit.pha2 <- fit.A
   class(fit) <- "ah.2ph"
   fit
 }

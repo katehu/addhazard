@@ -23,7 +23,7 @@
 #' library(survival)
 #' ###  fit the additive hazards model to the data
 #' nwts<- nwtsco[1:100,]
-#' fit <- ah(Surv(trel,relaps) ~ age + instit, data = nwts,  ties = FALSE, robust = FALSE)
+#' fit <- ah(Surv(trel,relaps) ~ age + instit, data = nwts,  ties = 'break', robust = FALSE)
 #'
 #' ###  see the covariate names in the prediction function
 #' fit$call
