@@ -5,7 +5,8 @@
 \alias{nwts2ph}
 \title{An hypothetical two-phase sampling dataset based on \link{nwtsco} dataset from
 the National Wilms Tumor Study (NWTS)}
-\format{A data frame with 3915 rows and 15 variables:
+\format{
+A data frame with 3915 rows and 15 variables:
 \describe{
 We create a hypothetical two-phase sampling (stratified sampling) dataset.
 In this dataset, only the subjects who have relapses and some of the controls have
@@ -53,10 +54,12 @@ measurements based on their outcomes and institutional histology results.
              0.5 for strata =1,
              0.9 for strata = 2,
              0.9 for strata = 3}
+\item{wts}{weight assigned to each individual, inverse of the selection probability}
 \item{in.ph2}{Phase II membership,
              1 = selected into the phase II subsample,
              0 = not selected into the phase II subsample}
-  }}
+  }
+}
 \source{
 This dataset was created based on \link{nwtsco} dataset from the National Wilms Tumor Study (NWTS)
 }
@@ -68,4 +71,3 @@ An hypothetical two-phase sampling dataset based on \link{nwtsco} dataset from
 the National Wilms Tumor Study (NWTS)
 }
 \keyword{datasets}
-

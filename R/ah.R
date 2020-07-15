@@ -32,7 +32,7 @@
 #'
 #' @note
 #'  The response variable is a survival object. The regression
-#'  model can be univariate or multivariate. This package is built upon the function
+#'  model can be univariate or multivariate. This function is built upon the function
 #'  \code{\link[ahaz]{ahaz}} by Anders Gorst-Rasmussen.
 #'
 #'
@@ -44,7 +44,7 @@
 #'                              Biometrika; 81:61-71.
 #'
 #' @importFrom survival Surv
-#' @importFrom stats residuals model.weights model.matrix model.extract terms
+#' @importFrom stats residuals model.weights model.matrix model.extract terms runif
 #' @export
 #'
 #' @examples

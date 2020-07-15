@@ -3,7 +3,7 @@
 \name{nwts2ph.generate}
 \alias{nwts2ph.generate}
 \title{This file genreate the example dataset nwts2ph
-importFrom("stats", "rbinom")}
+importFrom('stats', 'rbinom')}
 \usage{
 nwts2ph.generate(data, seed = 20)
 }
@@ -14,6 +14,5 @@ nwts2ph.generate(data, seed = 20)
 }
 \description{
 This file genreate the example dataset nwts2ph
-importFrom("stats", "rbinom")
+importFrom('stats', 'rbinom')
 }
-

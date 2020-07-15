@@ -4,8 +4,18 @@
 \alias{ah.2ph}
 \title{Fit Additive Hazards Regression Models to Two-phase Sampling}
 \usage{
-ah.2ph(formula, data, R, Pi, ties, robust = FALSE,
-  calibration.variables = NULL, ...)
+ah.2ph(
+  formula,
+  data,
+  R,
+  Pi = NULL,
+  weights = NULL,
+  ties,
+  robust = FALSE,
+  calibration.variables = NULL,
+  seed = 20,
+  ...
+)
 }
 \arguments{
 \item{formula}{a formula object for the regression model of the form
@@ -18,13 +28,19 @@ The subject is selected to phase II if R = 1.}
 
 \item{Pi}{the  probability of a subject to be selected to the phase II subsample.}
 
-\item{ties}{a logical variable. FALSE if there are no ties in the censored failure times.}
+\item{weights}{weight assigned to each individual, inverse of the selection probability}
+
+\item{ties}{a string. If there are ties in the survival time, when ties = 'break'
+a small random number is added to the survival time to break the ties.}
 
 \item{robust}{a logical variable.  Robust standard errors are provided if robust = TRUE.}
 
-\item{calibration.variables}{a vector of some column names of the data.
-These are the  variables available for every observation. They are used to
-calibrate the weight assigned to each subject in order to improve estimation efficiency.}
+\item{calibration.variables}{a vector of strings of some column names of the data.
+These are the variables available for every observation. They are used to
+calibrate the weight assigned to each subject}
+
+\item{seed}{an integer. Seed number used to generate random increment when 
+breaking ties. The default number is 20.}
 
 \item{...}{additional arguments to be passed to the low level regression fitting
 functions.}
@@ -39,33 +55,39 @@ The function fits a semiparametric additive hazards model
 }
 \note{
 This function estimates both model-based and robust standard errors. It can be
-used to analyze case-cohort studies. It allows subsampling among cases. It can
-incorporate the calibration procedure and analyze the combined dataset of phase
-I and phase II samples.
+used to analyze case-cohort studies with subsampling among cases. It allows
+weight calibration with auxiliary information from the full cohort (phase I sample).
+By this means, more information is used and thus weight calibration potentially 
+could further improve the precision of prediction or our estimation on the 
+regression coefficients.
 }
 \examples{
 library(survival)
 ### fit an additive hazards model to two-phase sampling data without calibration
-nwts2ph$trel <- nwts2ph$trel + runif(dim(nwts2ph)[1],0,1)*1e-8
-fit1 <- ah.2ph(Surv(trel,relaps) ~ age + histol, ties = FALSE, data = nwts2ph, R = in.ph2, Pi = Pi,
- robust = FALSE,  calibration.variables = NULL)
+fit1 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts2ph, R = in.ph2, Pi = Pi,
+ robust = FALSE,  ties = 'break')
+summary(fit1)
+
+### use weight instead of the selection probability Pi in the input
+fit1 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts2ph, R = in.ph2, weights = wts,
+ robust = FALSE,  ties = 'break')
 summary(fit1)
 
 ### fit an additve hazards model with calibration on age
-fit2 <- ah.2ph(Surv(trel,relaps) ~ age + histol, ties = FALSE, data = nwts2ph, R = in.ph2, Pi = Pi,
- robust = FALSE, calibration.variables = "age")
+fit2 <- ah.2ph(Surv(trel,relaps) ~ age + histol, data = nwts2ph, R = in.ph2, 
+            Pi = Pi, robust = FALSE, ties = 'break', calibration.variables = 'age')
 summary(fit2)
 
 ### calibrate on age square
-### note if users create a  calibration variable, then
+### note if users create a calibration variable, then
 ### the new variable should be added to the original data frame
 nwts2ph$age2 <- nwts2ph$age^2
-fit3 <- ah.2ph(Surv(trel,relaps) ~ age + histol, ties = FALSE, data = nwts2ph, R = in.ph2, Pi = Pi,
-                                   robust = FALSE, calibration.variables = "age2")
+fit3 <- ah.2ph(Surv(trel,relaps) ~ age + histol,  data = nwts2ph, 
+ R = in.ph2, Pi = Pi, robust = FALSE, ties = 'break', calibratio.variables = 'age2')
 summary(fit3)
 
 #############################################################################
-### When phase II samples are obtained by finite Sampling       #############
+## When phase II samples are obtained by finite Sampling     
 #############################################################################
 
 ### calculating the sample size for each straum
@@ -86,14 +108,15 @@ for (i in 1:length(strt.size)){
 ### create strt indicators, which become our calibration variables
 for (i in 1:length(strt.size)){
    nwts2ph_by_FPSS$strt_ind <- as.numeric(nwts2ph_by_FPSS$strt ==i)
-   names(nwts2ph_by_FPSS)[ncol(nwts2ph_by_FPSS)]= paste0("strt", i)
+   names(nwts2ph_by_FPSS)[ncol(nwts2ph_by_FPSS)]= paste0('strt', i)
 }
 ### fit an additve hazards model with finate sampling
 fit4 <- ah.2ph(Surv(trel,relaps) ~ age + histol,
-                                   data = nwts2ph_by_FPSS, ties = FALSE,
+                                   data = nwts2ph_by_FPSS, 
                                    R = in.ph2, Pi = Pi,
                                    robust = FALSE,
-                                   calibration.variables = c("strt1","strt2","strt3"))
+                                   ties = 'break',
+                                   calibration.variables = c('strt1','strt2','strt3'))
 summary(fit4)
 }
 \references{
@@ -105,4 +128,3 @@ Additive Hazards Models and  Epidemiologic Studies. Dissertation, University of 
 hazards model with two-phase sampling and \code{\link{nwtsco}} for the description
 of nwtsco dataset.
 }
-

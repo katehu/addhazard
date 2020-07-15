@@ -4,7 +4,8 @@
 \name{nwtsco}
 \alias{nwtsco}
 \title{Dataset from the National Wilms Tumor Study (NWTS)}
-\format{A data frame with 3915 rows and 12 variables:
+\format{
+A data frame with 3915 rows and 12 variables:
 \describe{
 \item{trel}{Time to relapse orlast date seen (yr), continuous}
 \item{tsur}{Time to death or last date seen (yr), continuous}
@@ -32,7 +33,8 @@
 \item{yr}{Year of diagnosis, calendar year}
 \item{specwgt}{Weight of tumor bearing specimen, in grams (continuous)}
 \item{tumdiam}{Diameter of tumor, in centimeters (continuous)}
-}}
+}
+}
 \source{
 Originally used by M. Kulich and D.Y. Lin:
  Improving the efficiency of relative-risk estimation in case-cohort studies.
@@ -45,4 +47,3 @@ nwtsco
 Dataset from the National Wilms Tumor Study (NWTS)
 }
 \keyword{datasets}
-
