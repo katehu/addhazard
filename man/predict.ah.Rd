@@ -28,7 +28,7 @@ hazards model fitted using \code{\link{ah}}.
 library(survival)
 ###  fit the additive hazards model to the data
 nwts<- nwtsco[1:100,]
-fit <- ah(Surv(trel,relaps) ~ age + instit, data = nwts,  ties = FALSE, robust = FALSE)
+fit <- ah(Surv(trel,relaps) ~ age + instit, data = nwts,  ties = 'break', robust = FALSE)
 
 ###  see the covariate names in the prediction function
 fit$call
@@ -48,4 +48,3 @@ predict(fit, newdata, newtime = c(3,5))
 \code{\link{ah}} for fitting the additive hazards model, \code{\link{nwtsco}} for
 the description of nwtsco dataset
 }
-

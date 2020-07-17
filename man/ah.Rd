@@ -4,7 +4,7 @@
 \alias{ah}
 \title{Fit Additive Hazards Regression Models}
 \usage{
-ah(formula, data, robust, weights, ties, ...)
+ah(formula, data, robust, weights, ties, seed = 20, ...)
 }
 \arguments{
 \item{formula}{a formula object for the regression model of the form
@@ -18,7 +18,11 @@ robust == TRUE.}
 
 \item{weights}{a numeric vector. The weight of each observation.}
 
-\item{ties}{a logical variable. FALSE if there are no ties in the censored failure times.}
+\item{ties}{a string. If there are ties in the survival time, when ties = 'break'
+a small random number is added to the survival time to break the ties.}
+
+\item{seed}{an integer. Seed number used to generate random increment when 
+breaking ties. The default number is 20.}
 
 \item{...}{additional arguments to be passed to the low level regression
 fitting functions.}
@@ -32,10 +36,8 @@ Fit a semiparametric additive hazard model
 The estimating procedures follow Lin & Ying (1994).
 }
 \note{
-The response variable is a survival object. If there are ties in the
- survival time, in the current version we recommend users to break ties by adding
- a small random number to the survival time. An example is provided.  The regression
- model can be univariate or multivariate. This package is built upon the function
+The response variable is a survival object. The regression
+ model can be univariate or multivariate. This function is built upon the function
  \code{\link[ahaz]{ahaz}} by Anders Gorst-Rasmussen.
 }
 \examples{
@@ -45,17 +47,20 @@ nwts<- nwtsco[1:100,]
 
 ### fit the additive hazards model to the data
 ### the model-based standard errors are reported when setting robust = FALSE
-fit1 <- ah(Surv(trel,relaps) ~ age + instit, ties = FALSE, data = nwts, robust = FALSE)
+fit1 <- ah(Surv(trel,relaps) ~ age + instit, data = nwts, robust = FALSE)
 summary(fit1)
 
 ### fit the additive hazards model to the data with robust standard errors
-fit2 <- ah(Surv(trel,relaps) ~ age + instit, ties = FALSE, data = nwts, robust = TRUE)
+fit2 <- ah(Surv(trel,relaps) ~ age + instit, data = nwts, robust = TRUE)
 summary(fit2)
 
-### when there are ties, break the ties first
+### when there are ties, break the ties by setting ties = 'break'
 nwts_all <- nwtsco
-nwts_all$trel <- nwtsco$trel + runif(dim(nwts_all)[1],0,1)*1e-8
-fit3 <- ah(Surv(trel,relaps) ~ age + instit, ties = FALSE, data = nwts_all, robust = TRUE)
+fit3 <- ah(Surv(trel,relaps) ~ age + instit, ties = 'break', data = nwts_all, robust = TRUE)
+summary(fit3)
+### users could break the ties on their own by
+nwts_all$trel <- nwtsco$trel + runif(dim(nwts_all)[1],0,1)*1e-10
+fit3 <- ah(Surv(trel,relaps) ~ age + instit, data = nwts_all, robust = TRUE)
 summary(fit3)
 }
 \references{
@@ -66,4 +71,3 @@ Lin, D.Y. & Ying, Z. (1994). Semiparametric analysis of the additive risk model.
 \code{\link{predict.ah}} for prediction based on fitted
  \code{\link{ah}} model, \code{\link{nwtsco}} for the description of nwtsco dataset
 }
-

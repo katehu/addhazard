@@ -1,17 +1,18 @@
 Package: addhazard
 Title: Fit Additive Hazards Models for Survival Analysis
-Version: 1.1.0
+Version: 1.2.0
 Authors@R: c(person("Jie (Kate)","Hu", role = c("aut", "cre"),
-                    email = "hujie0704@gmail.com"),
-                    person("Norman","Breslow", role = "aut"),
-                    person("Gary","Chan", role = "aut"))
-Date: 2017-03-20
-Description: Contains tools to fit the additive hazards model to data from a cohort,
-    random sampling, two-phase Bernoulli sampling and two-phase finite population sampling,
-    as well as calibration tool to incorporate phase I auxiliary information into the
-    two-phase data model fitting.  This package provides regression parameter estimates and
-    their model-based and robust standard errors. It also offers tools to make prediction of
-    individual specific hazards.
+                    email = "hujie0704@gmail.com", 
+                    comment = c(ORCID = "0000-0002-7987-8419")))
+Date: 2020-07-15
+Description: Contains tools to fit the additive hazards model to a cohort 
+    study, a case-cohort study, or a general two-phase sampling study. It allows weight
+    calibration to incorporate additional auxiliary information from the full cohort
+    into the estimation procedure in a case-cohort study or from the phase I sample 
+    in a two-phase sampling study. It can be used for both Bernoulli and
+    finite population sampling. This package provides regression parameter estimates
+    and their model-based and robust standard errors. It also offers tools to make prediction
+    of individual specific hazards at a specified time.
 LazyData: true
 Depends:
     R (>= 3.3.1)
@@ -19,6 +20,6 @@ Imports:
     ahaz,
     survival,
     rootSolve
-RoxygenNote: 5.0.1
-License: GPL-2
-
+RoxygenNote: 7.1.1
+License: GPL-2 | file LICENSE
+BugReports: https://github.com/katehu/addhazard/issues
